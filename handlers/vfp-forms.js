@@ -6,7 +6,7 @@ const VfpFormsHelper = (props) => {
     const { SKED_ACCESS_TOKEN } = props;
 
     const readConfigurations = async () => {
-        let rawdata = fs.readFileSync('../src/configurations/vfp-forms.json');
+        let rawdata = fs.readFileSync('./src/configurations/vfp-forms.json');
         try {
             return JSON.parse(rawdata);
         } catch (e) {
@@ -36,7 +36,7 @@ const VfpFormsHelper = (props) => {
 
     const deploy = async () => {
         const vfpForms = await readConfigurations();
-        console.log('>>>> Deploying visualpage forms', vfpForms);
+        console.log('>>>> Deploying visualpage forms');
         
         const result = {
             input: vfpForms,

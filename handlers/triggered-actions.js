@@ -6,7 +6,7 @@ const TriggeredActionsHelper = (props) => {
     const { SKED_ACCESS_TOKEN } = props;
 
     const readConfigurations = async () => {
-        let rawdata = fs.readFileSync('../src/configurations/triggered_actions.json');
+        let rawdata = fs.readFileSync('./src/configurations/triggered_actions.json');
         return JSON.parse(rawdata);
     }
 
@@ -44,7 +44,7 @@ const TriggeredActionsHelper = (props) => {
     const deploy = async () => {
         const currentTriggeredActions = await getList();
         const triggeredActionsToDeploy = await readConfigurations();
-        console.log('>>>> Deploying triggered actions', triggeredActionsToDeploy.length);
+        console.log('>>>> Deploying triggered actions');
         
         const result = {};
 

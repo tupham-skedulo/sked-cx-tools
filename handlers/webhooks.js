@@ -6,7 +6,7 @@ const WebhooksHelper = (props) => {
     const { SKED_ACCESS_TOKEN } = props;
 
     const readConfigurations = async () => {
-        let rawdata = fs.readFileSync('../src/configurations/webhooks.json');
+        let rawdata = fs.readFileSync('./src/configurations/webhooks.json');
         try {
             return JSON.parse(rawdata);
         } catch (e) {
@@ -48,7 +48,7 @@ const WebhooksHelper = (props) => {
     const deploy = async () => {
         const currentwebhooks = await getList();
         const webhooksToDeploy = await readConfigurations();
-        console.log('>>>> Deploying webhooks', webhooksToDeploy.length);
+        console.log('>>>> Deploying webhooks');
         
         const result = {};
 
