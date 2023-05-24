@@ -37,5 +37,31 @@ esac
 
 sleep "$DELAY"
 
-echo -n "* Input access token (default: deploy/credentials.json) > "
+echo -n "* Enter access token (default: assets/credentials.txt) > "
 read -r token
+
+sleep "$DELAY"
+
+case $component in
+1)
+  echo -n "* Enter json file name (Webhooks) (default: assets/webhooks.json) > "
+  read -r file
+  ;;
+2)
+  echo -n "* Enter json file name (Trigger Actions) (default: assets/trigger-actions.json) > "
+  read -r file
+  ;;
+3)
+  echo -n "* Enter json file name (Custom Fields) (default: assets/custom-fields.json) > "
+  read -r file
+
+  node "./handlers/custom-fields.js" "$token" "$file"
+  ;;
+4)
+  echo -n "* Enter json file name (VPF Forms) (default: assets/vpf-forms.json) > "
+  read -r file
+  ;;
+*)
+  echo "Invalid entry."
+  ;;
+esac

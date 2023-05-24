@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DELAY=1
+DELAY=20
 while true; do
   clear
   cat << EOF
