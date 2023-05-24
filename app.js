@@ -6,7 +6,17 @@ import fs from "fs";
 const App = (props) => {
     const { SKED_ACCESS_TOKEN, mode, componentsToDeploy } = props;
 
-    const getHelper = (componentToDeploy) => {
+    const readAccessToken = async () => {
+        let rawdata = fs.readFileSync('./src/configurations/credentials.json');
+        try {
+            const credentials = JSON.parse(rawdata);
+            return credentials.SKED_ACCESS_TOKEN;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    const getHelper = async (componentToDeploy) => {
         const map = {
             1: null,
             2: createTriggeredActionsHelper,
@@ -16,16 +26,18 @@ const App = (props) => {
 
         if(!map[componentToDeploy]) return null;
         return map[componentToDeploy]({
-            SKED_ACCESS_TOKEN
+            SKED_ACCESS_TOKEN: SKED_ACCESS_TOKEN || await readAccessToken()
         })
     };
 
     const run = async () => {
         console.log('Magic show begins ...');
 
-        const helpers = componentsToDeploy.map(componentToDeploy => {
-            return getHelper(componentToDeploy);
-        }).filter(item => item);
+        let helpers = [];
+        for await (const componentToDeploy of componentsToDeploy) {
+            helpers.push(await getHelper(componentToDeploy));
+        };
+        helpers = helpers.filter(item => item);
 
         const helperResult = {};
         for await (const helper of helpers) {

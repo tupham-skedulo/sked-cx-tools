@@ -10,7 +10,7 @@ const VfpFormsHelper = (props) => {
         try {
             return JSON.parse(rawdata);
         } catch (e) {
-            return [];
+            return {};
         }
     }
 

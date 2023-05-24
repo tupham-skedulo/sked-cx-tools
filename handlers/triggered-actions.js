@@ -7,7 +7,11 @@ const TriggeredActionsHelper = (props) => {
 
     const readConfigurations = async () => {
         let rawdata = fs.readFileSync('./src/configurations/triggered_actions.json');
-        return JSON.parse(rawdata);
+        try {
+            return JSON.parse(rawdata);
+        } catch (e) {
+            return [];
+        }
     }
 
     const getList = async () => {
