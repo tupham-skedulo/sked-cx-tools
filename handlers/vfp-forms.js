@@ -49,7 +49,7 @@ const VfpFormsHelper = (props) => {
                 visualforce: vfpForms
             });
 
-            result.success = res;
+            result.success = res.data;
         } catch (e) {
             result.error = e;
         }
@@ -59,6 +59,7 @@ const VfpFormsHelper = (props) => {
     }
 
     return {
+        getName: () => 'Visualforce page forms',
         deploy
     }
 }

@@ -66,7 +66,7 @@ const WebhooksHelper = (props) => {
                     await deleteWebhook(webhook);
                 }
                 const res = await createWebhook(_.omit(webhook, ['id']));
-                result[webhook.name].success = res;
+                result[webhook.name].success = res.data;
             } catch (e) {
                 result[webhook.name].error = e;
             }
@@ -78,6 +78,7 @@ const WebhooksHelper = (props) => {
     }
 
     return {
+        getName: () => 'Webhooks',
         deploy
     }
 }

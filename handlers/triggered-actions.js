@@ -59,10 +59,10 @@ const TriggeredActionsHelper = (props) => {
             try {
                 const currentTriggeredAction = currentTriggeredActions.find(item => triggeredAction.name === item.name);
                 if(currentTriggeredAction) {
-                    await deleteTriggeredAction(triggeredAction);
+                    await deleteTriggeredAction(currentTriggeredAction);
                 }
                 const res = await createTriggeredAction(_.omit(triggeredAction, ['id']));
-                result[triggeredAction.name].success = res;
+                result[triggeredAction.name].success = res.data;
             } catch (e) {
                 result[triggeredAction.name].error = e;
             }
@@ -74,6 +74,7 @@ const TriggeredActionsHelper = (props) => {
     }
 
     return {
+        getName: () => 'Triggered actions',
         deploy
     }
 }
