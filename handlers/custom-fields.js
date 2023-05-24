@@ -98,9 +98,20 @@ const CustomFieldsHelper = (props) => {
         const currentSchemas = await getSchemasList();
         const currentFields = await getFieldsList();
         const { schemasData, fieldsData } = await readConfigurations();
-        console.log('>>>> Deploying custom fields');
 
-        const result = {};
+        const result = {
+            input: {
+                schemas: schemasData,
+                fields: fieldsData,
+            },
+            success: {
+                schemas: null,
+                fields: null,
+            },
+            error: null
+        };
+
+        console.log('>>>> Deploying custom fields');
 
         console.log('>>>> Purging fields', currentFields.length);
         await Promise.all(currentFields.map(async (field) => {
@@ -121,12 +132,16 @@ const CustomFieldsHelper = (props) => {
 
         try {
             console.log('>>>> Create schemas ', postSchemas.length);
-            await createSchemas(postSchemas);
+            const schemaRes = await createSchemas(postSchemas);
 
             console.log('>>>> Create fields ', postFields.length);
-            await createFields(postFields);
+            const fieldRes =  await createFields(postFields);
+
+            result.success.schemas = schemaRes.data;
+            result.success.fields = fieldRes.data;
         } catch (e) {
             console.log(e)
+            result.error = e;
         }
 
         console.log('>>>> Finished deploying custom fields');
@@ -135,7 +150,8 @@ const CustomFieldsHelper = (props) => {
     }
 
     return {
-        deploy
+        deploy,
+        getName: () => 'Custom fields',
     }
 }
 

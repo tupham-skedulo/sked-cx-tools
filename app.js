@@ -1,6 +1,7 @@
 import { createTriggeredActionsHelper } from "./handlers/triggered-actions.js";
 import { createVfpFormsHelper } from "./handlers/vfp-forms.js";
 import { createWebhooksHelper } from "./handlers/webhooks.js";
+import { createCustomFieldsHelper } from './handlers/custom-fields.js';
 import fs from "fs";
 
 const App = (props) => {
@@ -18,7 +19,7 @@ const App = (props) => {
 
     const getHelper = async (componentToDeploy) => {
         const map = {
-            1: null,
+            1: createCustomFieldsHelper,
             2: createTriggeredActionsHelper,
             3: createWebhooksHelper,
             4: createVfpFormsHelper
