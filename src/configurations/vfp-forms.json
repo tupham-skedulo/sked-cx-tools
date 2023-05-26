@@ -5,16 +5,20 @@
             "label": "Operation"
         },
         {
-            "name": "skedJobDetailsForm",
-            "label": "Job Allocation Details"
-        },
-        {
-            "name": "generateDriveWorksheetPdf",
+            "name": "GenerateDriveWorksheetPdf",
             "label": "[iOS] Drive Worksheet"
         },
         {
             "name": "generateDriveWorksheetHTM",
-            "label": "[Android] Drive Worksheet"
+            "label": "[Android] Drive Worksheet "
+        },
+        {
+            "name": "skedJobDetailsForm",
+            "label": "Job Allocation Details"
+        },
+        {
+            "name": "StagingSheetReport",
+            "label": "Staging Sheet Report"
         }
     ],
     "menuItems": [
@@ -31,8 +35,16 @@
             "label": "[Android] Personal Staff Schedule"
         },
         {
+            "name": "ReportPOC",
+            "label": "Staging Sheet"
+        },
+        {
             "name": "skedMobileResourceDriveList",
             "label": "Resources Agenda"
+        },
+        {
+            "name": "WeeklyStaffingRoleReport",
+            "label": "Weekly Staffing Role Report"
         }
     ],
     "nameFromJob": "skedMobileOperationRecordForm",
