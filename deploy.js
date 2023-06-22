@@ -16,6 +16,9 @@ async function main() {
         }, {
             value: 2,
             name: 'Deploy from org to org'
+        }, {
+            value: 3,
+            name: 'Backup current configs'
         }]
     }]);
     
@@ -27,8 +30,8 @@ async function main() {
     const { componentsToDeploy } = await inquirer.prompt([{
         type: 'checkbox',
         name: 'componentsToDeploy',
-        message: 'Which configurations need to be deployed:',
-        default: [1, 2, 3, 4],
+        message: 'Which configurations need to be deployed/backup:',
+        default: [1, 2, 3, 4, 5],
         choices: [{
             value: 1,
             name: 'Customfields'
@@ -41,6 +44,9 @@ async function main() {
         }, {
             value: 4,
             name: 'Visualforce Page Forms'
+        }, {
+            value: 5,
+            name: 'Org Preferences'
         }]
     }]);
 
@@ -57,7 +63,7 @@ async function main() {
         SKED_ACCESS_TOKEN: accessToken
     });
 
-    await app.run();
+    await app.run(mode);
 }
 
 await main();

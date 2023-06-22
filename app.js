@@ -2,6 +2,7 @@ import { createTriggeredActionsHelper } from "./handlers/triggered-actions.js";
 import { createVfpFormsHelper } from "./handlers/vfp-forms.js";
 import { createWebhooksHelper } from "./handlers/webhooks.js";
 import { createCustomFieldsHelper } from './handlers/custom-fields.js';
+import { createOrgPreferencesHelper } from './handlers/org-preferences.js';
 import fs from "fs";
 
 const App = (props) => {
@@ -22,7 +23,8 @@ const App = (props) => {
             1: createCustomFieldsHelper,
             2: createTriggeredActionsHelper,
             3: createWebhooksHelper,
-            4: createVfpFormsHelper
+            4: createVfpFormsHelper,
+            5: createOrgPreferencesHelper,
         };
 
         if(!map[componentToDeploy]) return null;
@@ -31,7 +33,7 @@ const App = (props) => {
         })
     };
 
-    const run = async () => {
+    const run = async (mode) => {
         console.log('Magic show begins ...');
 
         let helpers = [];
@@ -42,7 +44,7 @@ const App = (props) => {
 
         const helperResult = {};
         for await (const helper of helpers) {
-            const result = await helper.deploy();
+            const result = await (mode === 3 ? helper.backup() : helper.deploy());
             console.log('------------------------------------------------');
             helperResult[helper.getName()] = result;
         }
