@@ -24,6 +24,33 @@ const TriggeredActionsHelper = (props) => {
         return res?.data?.result || [];
     }
 
+    const saveConfigurations = (data) => {
+        try {
+            fs.writeFileSync(
+                `./src/backup/trigger-actions-${new Date().getTime()}.json`,
+                JSON.stringify(data, null, '\t')
+            );
+
+            console.log('>>>> Current trigger actions saved');
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const backup = async (data) => {
+        console.log('>>>> Saving current trigger actions');
+
+        if (!data) {
+            const currentTriggerActions = await getList();
+            saveConfigurations(currentTriggerActions);
+
+            return;
+        }
+
+        saveConfigurations(data);
+    }
+
+
     const deleteTriggeredAction = async (item) => {
         if(!item.id) return;
         const res = await axios.delete(`https://api.skedulo.com/triggered_actions/${item.id}`, {
@@ -47,6 +74,8 @@ const TriggeredActionsHelper = (props) => {
 
     const deploy = async () => {
         const currentTriggeredActions = await getList();
+        await backup(currentTriggeredActions);
+
         const triggeredActionsToDeploy = await readConfigurations();
         console.log('>>>> Deploying triggered actions');
         
@@ -79,7 +108,8 @@ const TriggeredActionsHelper = (props) => {
 
     return {
         getName: () => 'Triggered actions',
-        deploy
+        deploy,
+        backup
     }
 }
 

@@ -28,7 +28,7 @@ const OrgPreferencesHelper = (props) => {
     }
 
     const backup = async (data) => {
-        console.log('>>>> Saving current custom fields');
+        console.log('>>>> Saving current org preferences');
 
         if (!data) {
             const currentOrgPreferences = await getList();
