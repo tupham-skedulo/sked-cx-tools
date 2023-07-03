@@ -21,8 +21,8 @@ async function main() {
             name: 'Backup current configs'
         }]
     }]);
-    
-    if(mode === 1 || mode === 2) {
+
+    if (mode === 1 || mode === 2) {
         console.log('This mode is not supported yet');
         return;
     }
@@ -31,7 +31,7 @@ async function main() {
         type: 'checkbox',
         name: 'componentsToDeploy',
         message: 'Which configurations need to be deployed/backup:',
-        default: [1, 2, 3, 4, 5],
+        default: [1, 2, 3, 4, 5, 6],
         choices: [{
             value: 1,
             name: 'Customfields'
@@ -47,6 +47,9 @@ async function main() {
         }, {
             value: 5,
             name: 'Org Preferences'
+        }, {
+            value: 6,
+            name: 'Packages'
         }]
     }]);
 
@@ -57,11 +60,24 @@ async function main() {
         default: ''
     }]);
 
-    const app = createApp({
+    let appConfig = {
         mode,
         componentsToDeploy,
-        SKED_ACCESS_TOKEN: accessToken
-    });
+        SKED_ACCESS_TOKEN: accessToken,
+    };
+
+    if (componentsToDeploy.includes(6)) {
+        const { packagePath } = await inquirer.prompt([{
+            type: 'input',
+            name: 'packagePath',
+            message: 'Input package folder name (Package folder should be located in src/packages):',
+            default: ''
+        }]);
+
+        appConfig = { ...appConfig, packagePath };
+    }
+
+    const app = createApp(appConfig);
 
     await app.run(mode);
 }
