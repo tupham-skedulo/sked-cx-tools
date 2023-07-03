@@ -1,18 +1,29 @@
-import { createTriggeredActionsHelper } from "./handlers/triggered-actions.js";
-import { createVfpFormsHelper } from "./handlers/vfp-forms.js";
-import { createWebhooksHelper } from "./handlers/webhooks.js";
+import { createTriggeredActionsHelper } from './handlers/triggered-actions.js';
+import { createVfpFormsHelper } from './handlers/vfp-forms.js';
+import { createWebhooksHelper } from './handlers/webhooks.js';
 import { createCustomFieldsHelper } from './handlers/custom-fields.js';
 import { createOrgPreferencesHelper } from './handlers/org-preferences.js';
-import fs from "fs";
+import { createPackagesHelper } from './handlers/packages.js';
+import fs from 'fs';
 
 const App = (props) => {
-    const { SKED_ACCESS_TOKEN, mode, componentsToDeploy } = props;
+    const { SKED_ACCESS_TOKEN, mode, componentsToDeploy, packagePath } = props;
 
     const readAccessToken = async () => {
         let rawdata = fs.readFileSync('./src/configurations/credentials.json');
         try {
             const credentials = JSON.parse(rawdata);
             return credentials.SKED_ACCESS_TOKEN;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    const readPackageFolder = async () => {
+        let rawdata = fs.readFileSync('./src/configurations/packages.json');
+        try {
+            const credentials = JSON.parse(rawdata);
+            return credentials.folder;
         } catch (e) {
             return null;
         }
@@ -25,11 +36,13 @@ const App = (props) => {
             3: createWebhooksHelper,
             4: createVfpFormsHelper,
             5: createOrgPreferencesHelper,
+            6: createPackagesHelper,
         };
 
         if(!map[componentToDeploy]) return null;
         return map[componentToDeploy]({
-            SKED_ACCESS_TOKEN: SKED_ACCESS_TOKEN || await readAccessToken()
+            SKED_ACCESS_TOKEN: SKED_ACCESS_TOKEN || await readAccessToken(),
+            packagePath: packagePath || await readPackageFolder()
         })
     };
 
