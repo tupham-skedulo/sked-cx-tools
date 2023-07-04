@@ -5,9 +5,10 @@ import { createCustomFieldsHelper } from './handlers/custom-fields.js';
 import { createOrgPreferencesHelper } from './handlers/org-preferences.js';
 import { createPackagesHelper } from './handlers/packages.js';
 import fs from 'fs';
+import path from 'path';
 
 const App = (props) => {
-    const { SKED_ACCESS_TOKEN, mode, componentsToDeploy, packagePath } = props;
+    const { SKED_ACCESS_TOKEN, mode, componentsToDeploy, packageGit } = props;
 
     const readAccessToken = async () => {
         let rawdata = fs.readFileSync('./src/configurations/credentials.json');
@@ -19,11 +20,14 @@ const App = (props) => {
         }
     }
 
-    const readPackageFolder = async () => {
+    const readPackageConfig = () => {
         let rawdata = fs.readFileSync('./src/configurations/packages.json');
         try {
-            const credentials = JSON.parse(rawdata);
-            return credentials.folder;
+            const config = JSON.parse(rawdata);
+            return {
+                git: config.git,
+                branch: config?.branch
+            };
         } catch (e) {
             return null;
         }
@@ -42,7 +46,10 @@ const App = (props) => {
         if(!map[componentToDeploy]) return null;
         return map[componentToDeploy]({
             SKED_ACCESS_TOKEN: SKED_ACCESS_TOKEN || await readAccessToken(),
-            packagePath: packagePath || await readPackageFolder()
+            ...(componentToDeploy === 6 &&  {
+                packageGit: packageGit || readPackageConfig().git,
+                packageBranch: readPackageConfig().branch
+            })
         })
     };
 
@@ -62,7 +69,7 @@ const App = (props) => {
             helperResult[helper.getName()] = result;
         }
 
-        await fs.writeFileSync(`./src/configurations/logs/${new Date()}.json`, JSON.stringify(helperResult));
+        await fs.writeFileSync(path.join(process.env.PWD, `src/configurations/logs/${new Date()}.json`), JSON.stringify(helperResult));
     }
 
     return {

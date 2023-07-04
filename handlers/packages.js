@@ -1,5 +1,5 @@
 import fs from 'fs';
-import shell, { env } from 'shelljs';
+import shell from 'shelljs';
 import path from 'path';
 import FormData from 'form-data';
 import { createTarBall, getFileHash } from '../utils/tar.js';
@@ -21,10 +21,11 @@ function tarballFileFilter(filePath) {
 }
 
 const PackagesHelper = (props) => {
-    const { SKED_ACCESS_TOKEN, packagePath: originalPackagePath } = props;
+    const { SKED_ACCESS_TOKEN, packageGit, packageBranch } = props;
 
     const sourcePackage = path.join(process.cwd(), 'src/packages');
-    const packagePath = path.join(sourcePackage, originalPackagePath);
+    const gitFolder = packageGit.toString().split('/')?.pop()?.replace('.git', '');
+    const packagePath = path.join(sourcePackage, gitFolder);
 
     const bundlePackage = () => {
         const buildAssetsPath = path.join(packagePath, '/pre_deploy_assets')
@@ -130,34 +131,35 @@ const PackagesHelper = (props) => {
     const deployPackage = async () => {
         const pkg = getProjectData()
 
-        try {
-            const bundlePath = await bundlePackage()
+        const bundlePath = await bundlePackage()
 
-            if (bundlePath) {
-                console.log(`${pkg.name} Bundle success!`)
-            }
+        if (bundlePath) {
+            console.log(`${pkg.name} Bundle success!`)
+        }
 
-            const deployedPackage = await uploadPackage(bundlePath, pkg)
+        const deployedPackage = await uploadPackage(bundlePath, pkg)
 
-            const { name, hash } = deployedPackage
-            if (name && hash) {
-                console.log(`${name} Upload success!`)
-            }
+        const { name, hash } = deployedPackage
+        if (name && hash) {
+            console.log(`${name} Upload success!`)
+        }
 
-            const { result } = await startBuild(name, hash)
+        const { result } = await startBuild(name, hash)
 
-            if (!result) {
-                throw new Error(`${name} build failed!`)
-            }
+        if (!result) {
+            throw new Error(`${name} build failed!`)
+        }
 
-            console.log(`${name} Start build success!`)
+        console.log(`${name} Start build success!`)
 
-            const { id: buildId } = result
-            // Check build status every 5 minutes maximum 3 times
-            // Install if build status passed
-            let checkTime = 0
+        const { id: buildId } = result
+        // Check build status every 5 minutes maximum 3 times
+        // Install if build status passed
+        let checkTime = 0
 
-            console.log(`${name} Checking build progress...`)
+        console.log(`${name} Checking build progress...`);
+
+        return new Promise((resolve, reject) => {
             const installBuild = setInterval(async () => {
                 checkTime++
                 const { status } = await getBuildStatus(buildId)
@@ -167,7 +169,9 @@ const PackagesHelper = (props) => {
 
                     console.log(`${name} Install success!`)
 
-                    clearInterval(installBuild)
+                    clearInterval(installBuild);
+
+                    resolve(buildId);
                 }
 
                 if (checkTime === 3 || status === 'Failed') {
@@ -177,13 +181,7 @@ const PackagesHelper = (props) => {
                 }
 
             }, 1000 * 60)
-        } catch (error) {
-            if (error instanceof Error) {
-                console.log(`There is an error!!! ${error.message}`)
-                throw error.message
-            }
-            throw error
-        }
+        })
     }
 
     const deploy = async () => {
@@ -196,9 +194,25 @@ const PackagesHelper = (props) => {
         }
 
         try {
-            await deployPackage()
-        } catch (e) {
-            result.error = e;
+            shell.cd(sourcePackage);
+
+            if (!fs.existsSync(packagePath)) {
+                shell.exec(`git clone ${packageGit}`);
+            }
+
+            if (packageBranch) {
+                shell.cd(gitFolder);
+                shell.exec(`git checkout ${packageBranch}`);
+            }
+            shell.exec('find . -type d -name pre_deploy_assets -exec rm -rf {} \\;');
+
+            result.success = await deployPackage();
+        } catch (error) {
+            result.error = error;
+
+            if (error instanceof Error) {
+                console.log(`There is an error!!! ${error.message}`)
+            }
         }
 
         return result;
