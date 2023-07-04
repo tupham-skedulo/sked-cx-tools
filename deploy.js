@@ -47,10 +47,10 @@ async function main() {
         }, {
             value: 5,
             name: 'Org Preferences'
-        }, {
+        }].concat(mode !== 3 ? [{
             value: 6,
             name: 'Packages'
-        }]
+        }] : [])
     }]);
 
     const { accessToken } = await inquirer.prompt([{
@@ -66,15 +66,15 @@ async function main() {
         SKED_ACCESS_TOKEN: accessToken,
     };
 
-    if (componentsToDeploy.includes(6)) {
-        const { packagePath } = await inquirer.prompt([{
+    if (componentsToDeploy.includes(6) && mode !== 3) {
+        const { packageGit } = await inquirer.prompt([{
             type: 'input',
-            name: 'packagePath',
-            message: 'Input package folder name (Package folder should be located in src/packages):',
+            name: 'packageGit',
+            message: 'Input package git url (Package will be cloned in src/packages):',
             default: ''
         }]);
 
-        appConfig = { ...appConfig, packagePath };
+        appConfig = { ...appConfig, packageGit };
     }
 
     const app = createApp(appConfig);
