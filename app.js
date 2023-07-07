@@ -56,10 +56,11 @@ const App = (props) => {
     const run = async (mode) => {
         console.log('Magic show begins ...');
 
+        const logPath = path.join(process.env.PWD, 'src/configurations/logs');
         let helpers = [];
         for await (const componentToDeploy of componentsToDeploy) {
             helpers.push(await getHelper(componentToDeploy));
-        };
+        }
         helpers = helpers.filter(item => item);
 
         const helperResult = {};
@@ -69,7 +70,11 @@ const App = (props) => {
             helperResult[helper.getName()] = result;
         }
 
-        await fs.writeFileSync(path.join(process.env.PWD, `src/configurations/logs/${new Date()}.json`), JSON.stringify(helperResult));
+        if (!fs.existsSync(logPath)){
+            fs.mkdirSync(logPath, { recursive: true });
+        }
+
+        await fs.writeFileSync(path.join(logPath, `${new Date()}.json`), JSON.stringify(helperResult));
     }
 
     return {
