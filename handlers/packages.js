@@ -194,6 +194,10 @@ const PackagesHelper = (props) => {
         }
 
         try {
+            if (!fs.existsSync(sourcePackage)){
+                fs.mkdirSync(sourcePackage, { recursive: true });
+            }
+
             shell.cd(sourcePackage);
 
             if (!fs.existsSync(packagePath)) {
