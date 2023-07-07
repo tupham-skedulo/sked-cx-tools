@@ -24,6 +24,32 @@ const WebhooksHelper = (props) => {
         return res?.data?.result || [];
     }
 
+    const saveConfigurations = (data) => {
+        try {
+            fs.writeFileSync(
+                `./src/backup/webhooks-${new Date().getTime()}.json`,
+                JSON.stringify(data, null, '\t')
+            );
+
+            console.log('>>>> Current webhooks saved');
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const backup = async (data) => {
+        console.log('>>>> Saving current webhooks');
+
+        if (!data) {
+            const currentWebhooks = await getList();
+            saveConfigurations(currentWebhooks);
+
+            return;
+        }
+
+        saveConfigurations(data);
+    }
+
     const deleteWebhook = async (item) => {
         if(!item.id) return;
         const res = await axios.delete(`https://api.skedulo.com/webhooks/${item.id}`, {
@@ -47,6 +73,8 @@ const WebhooksHelper = (props) => {
 
     const deploy = async () => {
         const currentwebhooks = await getList();
+        await backup(currentwebhooks);
+
         const webhooksToDeploy = await readConfigurations();
         console.log('>>>> Deploying webhooks');
         
@@ -79,7 +107,8 @@ const WebhooksHelper = (props) => {
 
     return {
         getName: () => 'Webhooks',
-        deploy
+        deploy,
+        backup
     }
 }
 
