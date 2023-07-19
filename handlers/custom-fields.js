@@ -40,18 +40,72 @@ const CustomFieldsHelper = (props) => {
         }
     }
 
+    const saveConfigurations = (data) => {
+        try {
+            fs.writeFileSync(
+                `./src/backup/custom-fields-${new Date().getTime()}.json`,
+                JSON.stringify(data, null, '\t')
+            );
+
+            console.log('>>>> Current custom fields saved');
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const backup = async (data) => {
+        console.log('>>>> Saving current custom fields');
+
+        if (!data) {
+            const currentSchemas = await getSchemasList();
+            const currentFields = await getFieldsList();
+            const dataToSave = transformData(currentSchemas, currentFields);
+
+            saveConfigurations(dataToSave);
+
+            return;
+        }
+
+        saveConfigurations(data);
+    }
+
+    const transformData = (schemas, fields) => {
+        if (!schemas.length || !fields.length) {
+            return {}
+        }
+
+        return schemas.reduce((accumulative, currentSchemas) => {
+            const mappedFields = _.sortBy(fields.filter((field) => field.schemaName === currentSchemas.name), "displayOrder");
+
+            if (mappedFields.length > 0) {
+                accumulative[currentSchemas.name] = { ...currentSchemas, fields: mappedFields };
+            }
+
+            return accumulative;
+        }, {});
+    }
+
     const getSchemasList = async () => {
-        const res = await axios.get('https://api.skedulo.com/custom/schemas?legacyAlertPrefix=false', {
+        const customSchemasResponse = await axios.get('https://api.skedulo.com/custom/schemas', {
             headers: {
                 'Authorization': `Bearer ${SKED_ACCESS_TOKEN}`
             }
         })
 
-        return res?.data?.result || [];
+        const standardSchemasResponse = await axios.get('https://api.skedulo.com/custom/standard_schemas', {
+            headers: {
+                'Authorization': `Bearer ${SKED_ACCESS_TOKEN}`
+            }
+        })
+
+        const customSchemas = (customSchemasResponse?.data?.result ?? []).map((schemas) => ({ ...schemas, isStandard: false }))
+        const standardSchemas = (standardSchemasResponse?.data?.result ?? []).map((schemas) => ({ ...schemas, isStandard: true }))
+
+        return [...customSchemas, ...standardSchemas];
     }
 
     const getFieldsList = async () => {
-        const res = await axios.get('https://api.skedulo.com/custom/fields?legacyAlertPrefix=false', {
+        const res = await axios.get('https://api.skedulo.com/custom/fields', {
             headers: {
                 'Authorization': `Bearer ${SKED_ACCESS_TOKEN}`
             }
@@ -99,6 +153,12 @@ const CustomFieldsHelper = (props) => {
         const currentFields = await getFieldsList();
         const { schemasData, fieldsData } = await readConfigurations();
 
+        console.log('>>>> Saving current custom fields');
+        const dataToSave = transformData(currentSchemas, currentFields);
+        await backup(dataToSave);
+
+        const currentCustomSchemas  = currentSchemas.filter((schemas) => !schemas.isStandard);
+
         const result = {
             input: {
                 schemas: schemasData,
@@ -120,8 +180,8 @@ const CustomFieldsHelper = (props) => {
             console.log(e)
         });
 
-        console.log('>>>> Purging schemas', currentSchemas.length);
-        await Promise.all(currentSchemas.map(async (schemas) => {
+        console.log('>>>> Purging schemas', currentCustomSchemas.length);
+        await Promise.all(currentCustomSchemas.map(async (schemas) => {
             await deleteSchemas(schemas);
         })).catch((e) => {
             console.log(e)
@@ -152,6 +212,7 @@ const CustomFieldsHelper = (props) => {
     return {
         deploy,
         getName: () => 'Custom fields',
+        backup,
     }
 }
 

@@ -24,6 +24,32 @@ const VfpFormsHelper = (props) => {
         return res?.data?.result?.visualforce || {};
     }
 
+    const saveConfigurations = (data) => {
+        try {
+            fs.writeFileSync(
+                `./src/backup/vfp-forms-${new Date().getTime()}.json`,
+                JSON.stringify(data, null, '\t')
+            );
+
+            console.log('>>>> Current vfp forms saved');
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const backup = async (data) => {
+        console.log('>>>> Saving vfp forms');
+
+        if (!data) {
+            const currentVfpForms = await get();
+            saveConfigurations(currentVfpForms);
+
+            return;
+        }
+
+        saveConfigurations(data);
+    }
+
     const save = async (item) => {
         const res = await axios.post(`https://api.skedulo.com/config/org_preference`, item, {
             headers: {
@@ -35,6 +61,9 @@ const VfpFormsHelper = (props) => {
     }
 
     const deploy = async () => {
+        const currentVfpForms = await get();
+        await backup(currentVfpForms);
+
         const vfpForms = await readConfigurations();
         console.log('>>>> Deploying visualpage forms');
         
@@ -60,7 +89,8 @@ const VfpFormsHelper = (props) => {
 
     return {
         getName: () => 'Visualforce page forms',
-        deploy
+        deploy,
+        backup
     }
 }
 
