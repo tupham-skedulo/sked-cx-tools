@@ -194,6 +194,10 @@ const PackagesHelper = (props) => {
         }
 
         try {
+            if (!fs.existsSync(sourcePackage)){
+                fs.mkdirSync(sourcePackage, { recursive: true });
+            }
+
             shell.cd(sourcePackage);
 
             if (!fs.existsSync(packagePath)) {
@@ -204,7 +208,12 @@ const PackagesHelper = (props) => {
                 shell.cd(gitFolder);
                 shell.exec(`git checkout ${packageBranch}`);
             }
-            shell.exec('find . -type d -name pre_deploy_assets -exec rm -rf {} \\;');
+
+            const buildAssetsPath = path.join(packagePath, '/pre_deploy_assets')
+
+            if (fs.existsSync(buildAssetsPath)) {
+                shell.exec('rm -rf pre_deploy_assets');
+            }
 
             result.success = await deployPackage();
         } catch (error) {
