@@ -1,5 +1,5 @@
 {
-  "disableEnRoute": true,
+  "disableEnRoute": false,
   "disableOnSite": true,
   "mobile": {
     "jobVisibilitySettings": {
