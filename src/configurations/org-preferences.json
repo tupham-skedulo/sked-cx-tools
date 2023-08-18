@@ -1,4 +1,6 @@
 {
+  "disableEnRoute": false,
+  "disableOnSite": true,
   "mobile": {
     "jobVisibilitySettings": {
       "resourceDetailsVisibility": {
