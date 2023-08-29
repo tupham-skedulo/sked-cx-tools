@@ -35,10 +35,6 @@
             "label": "[Android] Personal Staff Schedule"
         },
         {
-            "name": "ReportPOC",
-            "label": "Staging Sheet"
-        },
-        {
             "name": "skedMobileResourceDriveList",
             "label": "Resources Agenda"
         },
