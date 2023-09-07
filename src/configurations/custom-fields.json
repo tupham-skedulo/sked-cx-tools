@@ -950,7 +950,17 @@
 				"showMobile": true,
 				"editableOnMobile": true,
 				"requiredOnMobile": true,
-				"displayOrder": null
+				"displayOrder": null,
+				"items": [
+					[
+						"Drive",
+						"Drive"
+					],
+					[
+						"NCE",
+						"NCE"
+					]
+				]
 			},
 			{
 				"id": "f679e830-bddf-4f93-98a7-2783b3458671",
@@ -1185,7 +1195,17 @@
 				"showMobile": true,
 				"editableOnMobile": true,
 				"requiredOnMobile": false,
-				"displayOrder": null
+				"displayOrder": null,
+				"items": [
+					[
+						"CDL",
+						"CDL"
+					],
+					[
+						"Non CDL",
+						"Non CDL"
+					]
+				]
 			},
 			{
 				"id": "5363d141-e6d8-4fbb-9c61-7b7170eae4c8",
@@ -1235,7 +1255,21 @@
 				"showMobile": true,
 				"editableOnMobile": true,
 				"requiredOnMobile": true,
-				"displayOrder": null
+				"displayOrder": null,
+				"items": [
+					[
+						"Linked",
+						"Linked"
+					],
+					[
+						"Allocated",
+						"Allocated"
+					],
+					[
+						"Canceled",
+						"Canceled"
+					]
+				]
 			},
 			{
 				"id": "7b6a0116-3ef8-4f8d-ab01-c1ae426b172d",
@@ -1485,7 +1519,17 @@
 				"showMobile": true,
 				"editableOnMobile": true,
 				"requiredOnMobile": true,
-				"displayOrder": null
+				"displayOrder": null,
+				"items": [
+					[
+						"DSS",
+						"DSS"
+					],
+					[
+						"TL",
+						"TL"
+					]
+				]
 			},
 			{
 				"id": "9815fc3e-1806-412a-acf7-6b02ad1c6951",
@@ -1595,7 +1639,17 @@
 				"showMobile": true,
 				"editableOnMobile": true,
 				"requiredOnMobile": false,
-				"displayOrder": null
+				"displayOrder": null,
+				"items": [
+					[
+						"Active",
+						"Active"
+					],
+					[
+						"Inactive",
+						"Inactive"
+					]
+				]
 			},
 			{
 				"id": "0bc2d38c-927d-40c8-a542-ac25de1aa18c",
@@ -2992,31 +3046,6 @@
 				"displayOrder": null
 			},
 			{
-				"id": "bf7d0c76-e138-4076-99ba-467e4fa7f1a6",
-				"name": "BusType",
-				"schemaName": "Jobs",
-				"label": "Bus Type",
-				"description": null,
-				"fieldType": "picklist",
-				"mapping": "__bustype",
-				"referenceSchemaName": null,
-				"referenceSchemaFieldName": null,
-				"required": false,
-				"upsertKey": false,
-				"accessMode": "read_write",
-				"readOnly": false,
-				"maxLength": null,
-				"precision": null,
-				"scale": null,
-				"isAlert": false,
-				"showIf": null,
-				"showDesktop": true,
-				"showMobile": true,
-				"editableOnMobile": true,
-				"requiredOnMobile": false,
-				"displayOrder": null
-			},
-			{
 				"id": "a61d84df-6d4e-487d-aa4a-7b51e41dcb92",
 				"name": "LinkedDrive",
 				"schemaName": "Jobs",
@@ -3115,6 +3144,45 @@
 				"editableOnMobile": false,
 				"requiredOnMobile": false,
 				"displayOrder": null
+			},
+			{
+				"id": "bf7d0c76-e138-4076-99ba-467e4fa7f1a6",
+				"name": "BusType",
+				"schemaName": "Jobs",
+				"label": "Bus Type",
+				"description": null,
+				"fieldType": "picklist",
+				"mapping": "__bustype",
+				"referenceSchemaName": null,
+				"referenceSchemaFieldName": null,
+				"required": false,
+				"upsertKey": false,
+				"accessMode": "read_write",
+				"readOnly": false,
+				"maxLength": null,
+				"precision": 0,
+				"scale": null,
+				"isAlert": false,
+				"showIf": null,
+				"showDesktop": true,
+				"showMobile": true,
+				"editableOnMobile": true,
+				"requiredOnMobile": false,
+				"displayOrder": null,
+				"items": [
+					[
+						"CDL",
+						"CDL"
+					],
+					[
+						"NonCDL",
+						"Non CDL"
+					],
+					[
+						"Test",
+						"Test"
+					]
+				]
 			}
 		]
 	},

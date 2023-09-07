@@ -111,7 +111,21 @@ const CustomFieldsHelper = (props) => {
             }
         })
 
-        return res?.data?.result || [];
+        const fieldsResponse = res?.data?.result || [];
+
+        const result = await Promise.all(fieldsResponse?.map(async (item) => {
+            if (item.fieldType === 'picklist') {
+                const vocabularyItems = await fetchVocabularyItems(item.schemaName, item.name)
+                return {
+                    ...item,
+                    items: vocabularyItems?.data?.result?.map(({ value, label }) => [value, label])
+                }
+            }
+
+            return item;
+        }))
+
+        return result;
     }
 
     const deleteSchemas = async (item) => {
@@ -148,6 +162,14 @@ const CustomFieldsHelper = (props) => {
         });
     }
 
+    const fetchVocabularyItems = async (schemaName, fieldName) => {
+        return await axios.get(`https://api.skedulo.com/custom/vocabulary/${schemaName}/${fieldName}`, {
+            headers: {
+                'Authorization': `Bearer ${SKED_ACCESS_TOKEN}`
+            }
+        });
+    }
+
     const deploy = async () => {
         const currentSchemas = await getSchemasList();
         const currentFields = await getFieldsList();
@@ -157,7 +179,7 @@ const CustomFieldsHelper = (props) => {
         const dataToSave = transformData(currentSchemas, currentFields);
         await backup(dataToSave);
 
-        const currentCustomSchemas  = currentSchemas.filter((schemas) => !schemas.isStandard);
+        const currentCustomSchemas = currentSchemas.filter((schemas) => !schemas.isStandard);
 
         const result = {
             input: {
@@ -174,7 +196,7 @@ const CustomFieldsHelper = (props) => {
         console.log('>>>> Deploying custom fields');
 
         console.log('>>>> Purging fields', currentFields.length);
-        await Promise.all(currentFields.map(async (field) => {
+        await Promise.all(currentFields.filter((item) => item.mapping?.startsWith('_')).map(async (field) => {
             await deleteField(field);
         })).catch((e) => {
             console.log(e)
@@ -188,12 +210,20 @@ const CustomFieldsHelper = (props) => {
         });
 
         const postSchemas = schemasData.filter(item => item.id).map(item => _.omit(item, ['id']));
-        const postFields = fieldsData.map(item => ({
-            ..._.omit(item, ['id']),
-            column: {
-                type: item.fieldType
+        const postFields = fieldsData.filter((item) => item.mapping?.startsWith('_')).map(item => {
+            return {
+                ..._.omit(item, ['id']),
+                column: {
+                    type: item.fieldType,
+                    ...(item.maxLength !== null && { maxLength: item.maxLength }),
+                    ...(item.precision !== null && { precision: item.precision }),
+                    ...(item.scale !== null && { scale: item.scale }),
+                    ...(item.referenceSchemaName !== null && { referenceSchemaName: item.referenceSchemaName }),
+                    ...(item.fieldType === 'boolean' && { default: false }),
+                    ...(item.items && { items: item.items }),
+                }
             }
-        }));
+        });
 
         try {
             console.log('>>>> Create schemas ', postSchemas.length);
