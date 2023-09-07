@@ -116,7 +116,7 @@ const CustomFieldsHelper = (props) => {
 
     const deleteSchemas = async (item) => {
         if (!item.id) return;
-        return await axios.delete(`https://api.skedulo.com/custom/schema/${item.id}`, {
+        return await axios.delete(`https://api.skedulo.com/custom/standalone/schema/${item.id}`, {
             headers: {
                 'Authorization': `Bearer ${SKED_ACCESS_TOKEN}`
             }
@@ -125,7 +125,7 @@ const CustomFieldsHelper = (props) => {
 
     const deleteField = async (item) => {
         if (!item.id) return;
-        return await axios.delete(`https://api.skedulo.com/custom/field/${item.id}`, {
+        return await axios.delete(`https://api.skedulo.com/custom/standalone/field/${item.id}`, {
             headers: {
                 'Authorization': `Bearer ${SKED_ACCESS_TOKEN}`
             }
@@ -133,7 +133,7 @@ const CustomFieldsHelper = (props) => {
     }
 
     const createSchemas = async (items) => {
-        return await axios.post(`https://api.skedulo.com/custom/schemas`, items, {
+        return await axios.post(`https://api.skedulo.com/custom/standalone/schemas`, items, {
             headers: {
                 'Authorization': `Bearer ${SKED_ACCESS_TOKEN}`
             }
@@ -141,7 +141,7 @@ const CustomFieldsHelper = (props) => {
     }
 
     const createFields = async (items) => {
-        return await axios.post(`https://api.skedulo.com/custom/fields`, items, {
+        return await axios.post(`https://api.skedulo.com/custom/standalone/fields`, items, {
             headers: {
                 'Authorization': `Bearer ${SKED_ACCESS_TOKEN}`
             }
@@ -187,18 +187,28 @@ const CustomFieldsHelper = (props) => {
             console.log(e)
         });
 
-        const postSchemas = schemasData.filter(item => item.id);
-        const postFields = fieldsData.map(item => _.omit(item, ['id']));
+        const postSchemas = schemasData.filter(item => item.id).map(item => _.omit(item, ['id']));
+        const postFields = fieldsData.map(item => ({
+            ..._.omit(item, ['id']),
+            column: {
+                type: item.fieldType
+            }
+        }));
 
         try {
             console.log('>>>> Create schemas ', postSchemas.length);
-            const schemaRes = await createSchemas(postSchemas);
+            await Promise.all(postSchemas.map(async (schemas) => {
+                await createSchemas(schemas);
+            })).then((schemaRes) => {
+                result.success.schemas = schemaRes;
+            })
 
             console.log('>>>> Create fields ', postFields.length);
-            const fieldRes =  await createFields(postFields);
-
-            result.success.schemas = schemaRes.data;
-            result.success.fields = fieldRes.data;
+            await Promise.all(postFields.map(async (field) => {
+                await createFields(field);
+            })).then((fieldRes) => {
+                result.success.fields = fieldRes;
+            })
         } catch (e) {
             console.log(e)
             result.error = e;
