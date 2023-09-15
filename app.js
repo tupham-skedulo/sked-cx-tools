@@ -35,7 +35,7 @@ const App = (props) => {
 
     const getHelper = async (componentToDeploy) => {
         const map = {
-            1: createCustomFieldsHelper,
+            // 1: createCustomFieldsHelper, //tempory disable custom field deployment in Pulse
             2: createTriggeredActionsHelper,
             3: createWebhooksHelper,
             4: createVfpFormsHelper,

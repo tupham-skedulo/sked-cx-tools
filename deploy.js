@@ -31,22 +31,13 @@ async function main() {
         type: 'checkbox',
         name: 'componentsToDeploy',
         message: 'Which configurations need to be deployed/backup:',
-        default: [1, 2, 3, 4, 5, 6],
+        default: [2, 3, 6],
         choices: [{
-            value: 1,
-            name: 'Customfields'
-        }, {
             value: 2,
             name: 'Triggered Actions'
         }, {
             value: 3,
             name: 'Webhooks'
-        }, {
-            value: 4,
-            name: 'Visualforce Page Forms'
-        }, {
-            value: 5,
-            name: 'Org Preferences'
         }].concat(mode !== 3 ? [{
             value: 6,
             name: 'Packages'
